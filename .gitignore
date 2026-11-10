@@ -1,0 +1,4 @@
+node_modules/
+dist/
+.env
+seed/prototype-data.json

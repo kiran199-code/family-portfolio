@@ -1,0 +1,35 @@
+# Render Blueprint: one Docker web service (API + built React UI) and one managed Postgres.
+# Plans below are paid "starter" tiers on purpose: the app runs its own refresh schedule, so it must not sleep,
+# and the database holds your ledger. Verify current plan names/prices on render.com before applying.
+databases:
+  - name: portfolio-db
+    plan: basic-256mb
+    region: singapore
+    databaseName: portfolio
+    postgresMajorVersion: "16"
+    ipAllowList: []          # no public access; only Render services in the same region/account connect
+
+services:
+  - type: web
+    name: family-portfolio
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: false
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: portfolio-db, property: connectionString }
+      - key: APP_SECRET
+        generateValue: true
+      - key: ADMIN_USER
+        sync: false           # asked for in the Render dashboard on first apply
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SEED_ON_EMPTY
+        value: "true"         # loads seed/prototype-data.json once, only if the ledger is empty
+      - key: ENABLE_UNOFFICIAL_YAHOO
+        value: "false"
+      - key: TZ
+        value: Asia/Kolkata

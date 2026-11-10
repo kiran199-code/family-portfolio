@@ -22,3 +22,10 @@ First start migrates the schema. Load your data once: `docker compose exec app n
 3. Set manual prices for ULIP funds, DBS and unmapped stocks (MOCAPITAL, Shadowfax, Vedanta Aluminium).
 See docs/providers.md. Known gaps: no CAMS PDF parser, no NPS live feed, tax rules not encoded (gains show holding days only).
 The seed file contains real holdings: keep this repo private.
+
+## Deploy on Render
+1. Render dashboard > New > Blueprint > pick this (private) GitHub repo. It reads `render.yaml`: one Docker web service + one Postgres.
+2. When prompted, set ADMIN_USER and ADMIN_PASSWORD (10+ chars). APP_SECRET is generated; **do not change it later** or stored broker tokens become unreadable.
+3. First start migrates the schema and, because the ledger is empty, seeds from `seed/prototype-data.json`. After that, set `SEED_ON_EMPTY` to `false`.
+4. Open the service URL, sign in, then Admin: add the broker token and verify symbols.
+Notes: keep the service on a paid, always-on plan (the scheduler runs in-process). Enable Postgres backups/point-in-time recovery on the database plan you choose; confirm what your plan includes.
